@@ -69,13 +69,13 @@ document.addEventListener("DOMContentLoaded", function() {
     function setupSimulation() {
         // 以前のピン配置情報をクリア
         bottomRowPins = [];
-        // シーン初期化：World.clear(engine.world, false)はピンや板など全てを一度消去する
+        // シーン初期化
         World.clear(engine.world, false);
 
-        // ピンの配置（上向き三角形）
-        const rowCount = params.rowCount; // ピンの行数
-        const startY = 60; // ピンの開始位置（Y座標）
-        const centerX = canvasWidth / 2; // キャンバスの中央位置（X座標）
+        // ピンの配置
+        const rowCount = params.rowCount; 
+        const startY = 60; 
+        const centerX = canvasWidth / 2; 
         for (let row = 0; row < rowCount; row++) {
             let numPins = row + 1;
             let leftX = centerX - (row * (params.colSpacing / 2));
@@ -86,7 +86,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     isStatic: true,
                     restitution: 0.6,
                     friction: 0.01,
-                    render: { fillStyle: '#666' }
+                    render: { 
+                        fillStyle: '#ff00ff',    // マゼンタ
+                        strokeStyle: '#000000',  // 黒枠
+                        lineWidth: 3 
+                    }
                 });
                 World.add(engine.world, pin);
                 if (row === rowCount - 1) {
@@ -95,29 +99,27 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-        // 受け皞の配置
+        // 受け皿の設定（ここから修正：壁のすり抜け対策）
         binY = (60 + (rowCount - 1) * params.rowSpacing) + params.rowSpacing;
         binLeftBoundary = bottomRowPins[0] - (params.colSpacing / 2);
         binRightBoundary = bottomRowPins[bottomRowPins.length - 1] + (params.colSpacing / 2);
         let binWidthTotal = binRightBoundary - binLeftBoundary;
+
+        // 壁の厚さを定義（すり抜け防止のため極厚にする）
+        let wallThickness = 100;
+        let wallHeight = binY + 500;
+
+        // 床（少し厚めにしておく）
         let floor = Bodies.rectangle(
             (binLeftBoundary + binRightBoundary) / 2,
-            binY + 500 - 10,
-            binWidthTotal,
-            20,
+            binY + 500 + (wallThickness / 2) - 20, 
+            binWidthTotal + (wallThickness * 2), // 幅も広く
+            wallThickness, 
             { isStatic: true, render: { fillStyle: '#000' } }
         );
         World.add(engine.world, floor);
 
-        // 内側の仕切り
-        let partitionBoundaries = [];
-        partitionBoundaries.push(binLeftBoundary);
-        for (let i = 0; i < bottomRowPins.length - 1; i++) {
-            partitionBoundaries.push((bottomRowPins[i] + bottomRowPins[i + 1]) / 2);
-        }
-        partitionBoundaries.push(binRightBoundary);
-
-        // 仕切り板
+        // 内側の仕切り板
         for (let i = 0; i < bottomRowPins.length - 1; i++) {
             let dividerX = (bottomRowPins[i] + bottomRowPins[i + 1]) / 2;
             let divider = Bodies.rectangle(
@@ -125,26 +127,39 @@ document.addEventListener("DOMContentLoaded", function() {
                 binY + 500 / 2,
                 4,
                 500,
-                { isStatic: true, render: { fillStyle: '#999' } }
+                { isStatic: true, render: { fillStyle: '#000' } } // 真っ黒な線
             );
             World.add(engine.world, divider);
         }
 
-        // 左右の壁
-        let wallHeight = binY + 500;
+        // 左右の壁（外側にずらして配置）
         let leftWall = Bodies.rectangle(
-            binLeftBoundary,
+            binLeftBoundary - (wallThickness / 2), // 外へ逃がす
             wallHeight / 2,
-            4,
+            wallThickness,
             wallHeight,
-            { isStatic: true, render: { fillStyle: '#999' } }
+            { 
+                isStatic: true, 
+                render: { 
+                    fillStyle: '#222', 
+                    strokeStyle: '#000', 
+                    lineWidth: 4 
+                } 
+            }
         );
         let rightWall = Bodies.rectangle(
-            binRightBoundary,
+            binRightBoundary + (wallThickness / 2), // 外へ逃がす
             wallHeight / 2,
-            4,
+            wallThickness,
             wallHeight,
-            { isStatic: true, render: { fillStyle: '#999' } }
+            { 
+                isStatic: true, 
+                render: { 
+                    fillStyle: '#222', 
+                    strokeStyle: '#000', 
+                    lineWidth: 4 
+                } 
+            }
         );
         World.add(engine.world, leftWall);
         World.add(engine.world, rightWall);
@@ -228,12 +243,21 @@ document.addEventListener("DOMContentLoaded", function() {
             let barHeight = (count / maxCount) * canvas.height;
             let x = i * barWidth;
             let y = canvas.height - barHeight;
-            ctx.fillStyle = "#33a";
+            
+            // コミック風塗り
+            ctx.fillStyle = "#ffcc00"; // 黄色
             ctx.fillRect(x, y, barWidth - 2, barHeight);
-            ctx.font = "12px sans-serif";
-            ctx.fillStyle = y < 20 ? "#fff" : "#000";
-            let textY = y < 20 ? y + 15 : y - 2;
-            ctx.fillText(count, x + 2, textY);
+            
+            // 黒枠
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#000";
+            ctx.strokeRect(x, y, barWidth - 2, barHeight);
+
+            // テキスト
+            ctx.font = "bold 14px 'Comic Neue', sans-serif";
+            ctx.fillStyle = "#000";
+            let textY = y < 20 ? y + 20 : y - 5;
+            ctx.fillText(count, x + 5, textY);
         });
         drawNormalCurve(counts);
     }
@@ -245,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let canvas = document.getElementById("barChart");
         let ctx = canvas.getContext("2d");
         let n = counts.length;
-        let total = counts.reduce((sum, v) => sum + v, 0);
+        // ... (中略：計算部分は変更なし) ...
         let mean = (n - 1) / 2;
         let std = n / 4;
         let pdf = [];
@@ -258,6 +282,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         let scale = canvas.height / maxPdf;
         let barWidth = canvas.width / n;
+        
         ctx.beginPath();
         for (let i = 0; i < n; i++) {
             let scaledPdf = pdf[i] * scale;
@@ -266,8 +291,11 @@ document.addEventListener("DOMContentLoaded", function() {
             if (i === 0) { ctx.moveTo(x, y); }
             else { ctx.lineTo(x, y); }
         }
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
+        
+        // 描画スタイル変更
+        ctx.strokeStyle = "#ff0000"; // 赤
+        ctx.lineWidth = 5;           // 極太
+        ctx.lineCap = "round";
         ctx.stroke();
     }
 
@@ -279,22 +307,25 @@ document.addEventListener("DOMContentLoaded", function() {
             stopBallGeneration();
             return;
         }
-        // チェックボックスの状態を取得し、ランダムオフセット・速度の付与を制御
         let enableRandomOffset = document.getElementById("enableRandomOffset").checked;
         let enableRandomVelocity = document.getElementById("enableRandomVelocity").checked;
 
-        // ランダムオフセットX（有効なら -1～1 の乱数、無効なら0）
         let randomOffsetX = enableRandomOffset ? ((Math.random() * 2) - 1) : 0;
-        let spawnX = (canvasWidth / 2) + randomOffsetX; // キャンバス中央にオフセットを加える
+        let spawnX = (canvasWidth / 2) + randomOffsetX;
+        
         let ball = Bodies.circle(spawnX, 0, params.ballRadius, {
             density: params.density,
             restitution: params.restitution,
             friction: params.friction,
             frictionAir: params.frictionAir,
-            render: { fillStyle: '#33a' }
+            render: { 
+                fillStyle: '#00ffff',   // シアン
+                strokeStyle: '#000000', // 黒枠
+                lineWidth: 3 
+            }
         });
         World.add(engine.world, ball);
-        // ランダム速度X（有効なら -1～1 の乱数、無効なら0）
+
         let randomVelocityX = enableRandomVelocity ? ((Math.random() * 2) - 1) : 0;
         Matter.Body.setVelocity(ball, { x: randomVelocityX, y: ball.velocity.y });
         ballCount++;
