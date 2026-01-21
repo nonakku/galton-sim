@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>正規分布シュミレーター</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="matter.min.js"></script>
+        <script src="script.js" defer></script>
+    </head>
+
+    <body>
+        <h2>正規分布シュミレーター</h2>
+        <!-- パラメータ入力フォーム -->
+        <div id="parameterPanel" style="margin:10px; padding:10px; border:1px solid #ccc;">
+            <button id="resetParamsButton">パラメータ初期化</button>
+            <!-- Method要素セクション -->
+            <div class="param-section" id="methodSection">
+                <h3>Method</h3>
+                <label>玉の生成数（秒あたり）: <input id="ballRateInput" type="number" step="0.1" value="2"></label>
+            </div>
+            <!-- Material要素セクション -->
+            <div class="param-section" id="ballSection">
+                <h3>Material</h3>
+                <label>玉の半径: <input id="ballRadiusInput" type="number" value="10"></label>
+                <label>密度: <input id="densityInput" type="number" step="0.01" value="0.1"></label>
+                <label>反発係数: <input id="restitutionInput" type="number" step="0.1" value="0.5"></label>
+                <label>摩擦: <input id="frictionInput" type="number" step="0.01" value="0.01"></label>
+            </div>
+            <!-- Machine要素セクション -->
+            <div class="param-section" id="pinSection">
+                <h3>Machine</h3>
+                <label>ピンの半径: <input id="pinRadiusInput" type="number" value="10"></label>
+                <label>ピン間の水平間隔: <input id="colSpacingInput" type="number" value="80"></label>
+                <label>行間の垂直間隔: <input id="rowSpacingInput" type="number" value="40"></label>
+                <label>ピンの行数: <input id="rowCountInput" type="number" value="9" readonly></label>
+            </div>
+            <!-- Man要素セクション -->
+            <div class="param-section" id="manSection">
+                <h3>Man</h3>
+                <label>
+                    ランダムオフセットXを有効にする:
+                    <input id="enableRandomOffset" type="checkbox" checked>
+                </label>
+                <label>
+                    ランダム速度Xを有効にする:
+                    <input id="enableRandomVelocity" type="checkbox" checked>
+                </label>
+            </div>
+            <!-- Environment要素セクション -->
+            <div class="param-section" id="environmentSection">
+                <h3>Environment</h3>
+                <label>空気抵抗: <input id="frictionAirInput" type="number" step="0.01" value="0.01"></label>
+                <label>重力: <input id="gravityInput" type="number" step="0.1" value="1.0"></label>
+            </div>
+            <button id="restartSimulationButton">パラメータ反映</button>
+        </div>
+
+        <!-- トグルボタン（Start/Stopを切り替え） -->
+        <button id="toggleButton">Start</button>
+        <!-- 玉生成カウンター表示 -->
+        <div id="ballCounter" style="float:left">生成した玉数 = 0 個</div>
+        <!-- 受け皺内の各仕切り毎の玉数表示 -->
+        <div id="bucketCounts" style="font-size:20px; margin:10px;">各仕切りの玉数: </div>
+        <!-- 乖離数値表示 -->
+        <div id="deviationDisplay" style="font-size:20px; margin:10px; color: red;">乖離 (χ²): --</div>
+        <!-- シュミレーション描画用のコンテナ -->
+        <div id="simulationContainer" style="float:left;">
+            <!-- 棒グラフ描画用Canvas（右上に表示） -->
+            <canvas id="barChart" width="300" height="400"></canvas>
+        </div>
+    </body>
+
+</html>

@@ -1,0 +1,85 @@
+/* 全体の基本設定 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f8ff;
+    margin: 20px;
+    padding: 0;
+}
+
+/* パラメータ入力フォームのスタイル */
+#parameterPanel {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+#parameterPanel label {
+    display: inline-block;
+    margin: 5px 10px 5px 0;
+    font-size: 14px;
+}
+
+#parameterPanel input {
+    margin-left: 5px;
+    padding: 5px;
+    font-size: 14px;
+    width: 60px;
+}
+
+/* ボタンのスタイル */
+button {
+    background-color: #008CBA;
+    border: none;
+    color: #fff;
+    padding: 10px 16px;
+    margin: 5px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0079a1;
+}
+
+#stopButton:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 各種表示領域のスタイル */
+#ballCounter,
+#bucketCounts,
+#deviationDisplay {
+    font-size: 20px;
+    margin: 10px;
+}
+
+/* シュミレーション描画用コンテナ */
+#simulationContainer {
+    position: relative;
+    /* コンテナ内での絶対配置の基準 */
+    width: 1600px;
+    /* 適宜サイズ調整 */
+    height: 1600px;
+    /* 適宜サイズ調整 */
+    border: 1px solid #ccc;
+    margin: 10px;
+}
+
+/* 棒グラフ用 Canvas */
+#barChart {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    /* 背景を白に指定 */
+    border: 1px solid #ccc;
+    z-index: 2;
+    /* 必要に応じて前面に表示 */
+}
