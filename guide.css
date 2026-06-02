@@ -1,0 +1,296 @@
+:root {
+    --bg: #EAF4FB;
+    --panel: #ffffff;
+    --ink: #17324D;
+    --muted: #5D7288;
+    --line: #B8D1E5;
+    --primary: #1976D2;
+    --primary-dark: #0F5EAD;
+    --soft: #F7FBFE;
+    --note: #E3F2FD;
+    --warning: #FFF7E6;
+    --analogy: #EFF9F3;
+    --analogy-line: #A9D8BA;
+    --shadow: 0 14px 34px rgba(31, 72, 112, 0.14);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", "Yu Gothic UI", "Meiryo", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.guide {
+    width: min(980px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 28px 0 44px;
+}
+
+.hero {
+    padding: 28px 0 18px;
+}
+
+.back-link {
+    display: inline-flex;
+    margin-bottom: 18px;
+    color: var(--primary-dark);
+    font-size: 14px;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.back-link:hover,
+.button-link:hover {
+    text-decoration: underline;
+}
+
+.eyebrow {
+    margin: 0 0 6px;
+    color: var(--primary-dark);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 10px;
+    font-size: 36px;
+    line-height: 1.2;
+}
+
+h2 {
+    margin-bottom: 14px;
+    font-size: 24px;
+    line-height: 1.3;
+}
+
+h3 {
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.lead {
+    max-width: 760px;
+    color: var(--muted);
+    font-size: 18px;
+}
+
+.card {
+    margin-top: 18px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.summary-card {
+    border-color: #8FC1EA;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F3FAFF 100%);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.summary-grid > div {
+    padding: 16px;
+    background: var(--soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.galton-figure {
+    margin: 18px 0;
+    padding: 12px;
+    background: #F6FBFF;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.galton-figure svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.figure-bg {
+    fill: #FFFFFF;
+    stroke: #C5DBEC;
+    stroke-width: 2;
+}
+
+.board-line,
+.bins line {
+    stroke: #254A68;
+    stroke-width: 8;
+    stroke-linecap: round;
+}
+
+.board-floor {
+    stroke-width: 10;
+}
+
+.ball-path {
+    fill: none;
+    stroke: #6FB4D8;
+    stroke-width: 4;
+    stroke-dasharray: 8 9;
+    stroke-linecap: round;
+}
+
+.path-alt {
+    stroke: #9BCFBA;
+}
+
+.main-ball,
+.stack circle {
+    fill: #23BBD3;
+    stroke: #17324D;
+    stroke-width: 3;
+}
+
+.pins circle {
+    fill: #5D84A8;
+    stroke: #17324D;
+    stroke-width: 3;
+}
+
+.figure-label {
+    fill: var(--primary-dark);
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.label-line {
+    stroke: #8FBAD6;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+.figure-note {
+    fill: var(--muted);
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.formula {
+    margin: 16px 0;
+    padding: 14px 16px;
+    color: var(--primary-dark);
+    background: var(--note);
+    border: 1px solid #A9D3F2;
+    border-radius: 8px;
+    font-weight: 750;
+}
+
+.callout,
+.example-box,
+.analogy-box {
+    margin: 16px 0;
+    padding: 14px 16px;
+    border-radius: 8px;
+}
+
+.callout {
+    background: var(--warning);
+    border: 1px solid #F0D399;
+}
+
+.example-box {
+    background: var(--soft);
+    border: 1px solid var(--line);
+}
+
+.analogy-box {
+    background: var(--analogy);
+    border: 1px solid var(--analogy-line);
+}
+
+.example-title,
+.analogy-title {
+    margin-bottom: 4px;
+    font-weight: 800;
+}
+
+.example-title {
+    color: var(--primary-dark);
+}
+
+.analogy-title {
+    color: #247447;
+    font-weight: 800;
+}
+
+ul,
+ol {
+    margin: 0;
+    padding-left: 1.4em;
+}
+
+li + li {
+    margin-top: 6px;
+}
+
+.checklist-card li {
+    font-weight: 650;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 26px;
+}
+
+.button-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 18px;
+    color: #fff;
+    background: var(--primary);
+    border-radius: 7px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.button-link:hover {
+    background: var(--primary-dark);
+}
+
+@media (max-width: 720px) {
+    .guide {
+        width: min(100% - 24px, 980px);
+        padding-top: 14px;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 18px;
+    }
+}

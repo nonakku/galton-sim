@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /****************************************************************************
      * 目的：
-     *  ・テスト版レイアウト用にキャンバスを1000px x 960pxへ調整する
-     *  ・受け皿の深さを430pxにし、1画面に収まりやすくする
+     *  ・キャンバス幅を倍（1600px）にし、ピン配置と受け皞を拡大する
+     *  ・受け皞の深さを500pxにし、床を受け皞の底に合わせる
      *  ・パラメータ入力によりシミレーションの各パラメータを変更可能にする
      *  ・再スタートボタンでシミレーションを0から再構築する
      ****************************************************************************/
@@ -18,13 +18,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const Events = Matter.Events;
     const Composite = Matter.Composite;
 
-    // キャンバス設定（テスト版）
-    const canvasWidth = 1000;
-    const canvasHeight = 960;
-    const binDepth = 430;
-    const boardViewPadding = { x: 70, y: 60 };
-    const structureColor = '#254A68';
-    const dividerColor = '#426A8C';
+    // キャンバス設定（幅1600px, 高さ1600px）
+    const canvasWidth = 1600;
+    const canvasHeight = 1600;
 
     // グローバルパラメータ
     let params = {
@@ -53,10 +49,9 @@ document.addEventListener("DOMContentLoaded", function() {
             width: canvasWidth,
             height: canvasHeight,
             wireframes: false,
-            background: '#FAFCFE'
+            background: '#fafafa'
         }
     });
-    render.canvas.classList.add('physics-canvas');
 
     // Runner の開始
     let runner = Runner.create();
@@ -67,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function() {
     let ballIntervalId; // 玉生成用 setInterval の ID
     let isGenerating = false; // 玉生成中かどうかのフラグ
     let ballCount = 0;  // 生成した玉の数をカウントする変数
-    const maxBallCount = 200;
     const bucketUpdateIntervalMs = 100;
     let lastBucketUpdateTime = 0;
     let lastBucketCountsKey = "";
@@ -76,19 +70,6 @@ document.addEventListener("DOMContentLoaded", function() {
     let bottomRowPins = [];
     let bucketBoundaries = [];
     let binLeftBoundary, binRightBoundary, binY;
-    function fitBoardToView(wallThickness) {
-        Render.lookAt(render, [{
-            min: {
-                x: binLeftBoundary - wallThickness,
-                y: -params.ballRadius * 2
-            },
-            max: {
-                x: binRightBoundary + wallThickness,
-                y: binY + binDepth + wallThickness
-            }
-        }], boardViewPadding, true);
-    }
-
     function setupSimulation() {
         // 以前のピン配置情報をクリア
         bottomRowPins = [];
@@ -112,8 +93,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     restitution: 0.6,
                     friction: 0.01,
                     render: { 
-                        fillStyle: '#5D84A8',
-                        strokeStyle: '#17324D',
+                        fillStyle: '#ff00ff',    // マゼンタ
+                        strokeStyle: '#000000',  // 黒枠
                         lineWidth: 3 
                     }
                 });
@@ -133,16 +114,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // 壁の厚さを定義（すり抜け防止のため極厚にする）
         let wallThickness = 100;
-        let wallHeight = binY + binDepth;
+        let wallHeight = binY + 500;
 
         // 床（少し厚めにしておく）
-        let floorOverhang = 4;
         let floor = Bodies.rectangle(
             (binLeftBoundary + binRightBoundary) / 2,
-            binY + binDepth + (wallThickness / 2) - 20, 
-            binWidthTotal + (wallThickness * 2) + (floorOverhang * 2), // 壁との境目に隙間が出ないように少し広げる
+            binY + 500 + (wallThickness / 2) - 20, 
+            binWidthTotal + (wallThickness * 2), // 幅も広く
             wallThickness, 
-            { isStatic: true, render: { fillStyle: structureColor, strokeStyle: structureColor, lineWidth: 0 } }
+            { isStatic: true, render: { fillStyle: '#000' } }
         );
         World.add(engine.world, floor);
 
@@ -151,10 +131,10 @@ document.addEventListener("DOMContentLoaded", function() {
             let dividerX = (bottomRowPins[i] + bottomRowPins[i + 1]) / 2;
             let divider = Bodies.rectangle(
                 dividerX,
-                binY + binDepth / 2,
+                binY + 500 / 2,
                 4,
-                binDepth,
-                { isStatic: true, render: { fillStyle: dividerColor } }
+                500,
+                { isStatic: true, render: { fillStyle: '#000' } } // 真っ黒な線
             );
             World.add(engine.world, divider);
         }
@@ -168,9 +148,9 @@ document.addEventListener("DOMContentLoaded", function() {
             { 
                 isStatic: true, 
                 render: { 
-                    fillStyle: structureColor,
-                    strokeStyle: structureColor,
-                    lineWidth: 0
+                    fillStyle: '#222', 
+                    strokeStyle: '#000', 
+                    lineWidth: 4 
                 } 
             }
         );
@@ -182,15 +162,14 @@ document.addEventListener("DOMContentLoaded", function() {
             { 
                 isStatic: true, 
                 render: { 
-                    fillStyle: structureColor,
-                    strokeStyle: structureColor,
-                    lineWidth: 0
+                    fillStyle: '#222', 
+                    strokeStyle: '#000', 
+                    lineWidth: 4 
                 } 
             }
         );
         World.add(engine.world, leftWall);
         World.add(engine.world, rightWall);
-        fitBoardToView(wallThickness + floorOverhang);
     }
     setupSimulation();
 
@@ -238,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // テーブル形式（行と列を入れ替え）
         // １行目：各仕切りの番号をヘッダー（例：仕切り1, 仕切り2, …）
         // ２行目：対応する玉数
-        let tableHTML = '<table><tr>';
+        let tableHTML = '<table border="1" style="border-collapse: collapse; font-size:16px;"><tr>';
         counts.forEach((count, idx) => {
             tableHTML += `<th>仕切り${idx + 1}</th>`;
         });
@@ -252,8 +231,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // 棒グラフ更新
         drawBarChart(counts);
         
-        // 分布のズレとχ²検定の参考値を表示
-        updateDistributionDisplay(counts);
+        // 乖離（χ²）の計算と表示
+        let deviation = calculateDeviation(counts);
+        document.getElementById("deviationDisplay").innerText = "乖離 (χ²): " + deviation;
     }
 
     // --------------------------
@@ -263,53 +243,64 @@ document.addEventListener("DOMContentLoaded", function() {
         let canvas = document.getElementById("barChart");
         let ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let theoreticalCounts = getTheoreticalCounts(counts);
         let barWidth = canvas.width / counts.length;
-        let maxCount = Math.max(...counts, ...theoreticalCounts) || 1;
+        let maxCount = Math.max(...counts) || 1;
         counts.forEach((count, i) => {
             let barHeight = (count / maxCount) * canvas.height;
             let x = i * barWidth;
             let y = canvas.height - barHeight;
             
             // コミック風塗り
-            ctx.fillStyle = "#8ED5E8";
+            ctx.fillStyle = "#ffcc00"; // 黄色
             ctx.fillRect(x, y, barWidth - 2, barHeight);
             
             // 黒枠
             ctx.lineWidth = 2;
-            ctx.strokeStyle = "#17324D";
+            ctx.strokeStyle = "#000";
             ctx.strokeRect(x, y, barWidth - 2, barHeight);
 
             // テキスト
-            ctx.font = "bold 13px 'Segoe UI', sans-serif";
-            ctx.fillStyle = "#17324D";
+            ctx.font = "bold 14px 'Comic Neue', sans-serif";
+            ctx.fillStyle = "#000";
             let textY = y < 20 ? y + 20 : y - 5;
             ctx.fillText(count, x + 5, textY);
         });
-        drawTheoreticalCurve(theoreticalCounts, maxCount);
+        drawNormalCurve(counts);
     }
 
     // --------------------------
-    // 理論分布（二項分布）をオーバーレイする関数
+    // 正規分布曲線をオーバーレイする関数
     // --------------------------
-    function drawTheoreticalCurve(theoreticalCounts, maxCount) {
+    function drawNormalCurve(counts) {
         let canvas = document.getElementById("barChart");
         let ctx = canvas.getContext("2d");
-        let n = theoreticalCounts.length;
+        let n = counts.length;
+        // ... (中略：計算部分は変更なし) ...
+        let mean = (n - 1) / 2;
+        let std = n / 4;
+        let pdf = [];
+        let maxPdf = 0;
+        for (let i = 0; i < n; i++) {
+            let value = (1 / (std * Math.sqrt(2 * Math.PI))) *
+                Math.exp(-Math.pow(i - mean, 2) / (2 * std * std));
+            pdf.push(value);
+            if (value > maxPdf) { maxPdf = value; }
+        }
+        let scale = canvas.height / maxPdf;
         let barWidth = canvas.width / n;
         
         ctx.beginPath();
         for (let i = 0; i < n; i++) {
-            let barHeight = (theoreticalCounts[i] / maxCount) * canvas.height;
+            let scaledPdf = pdf[i] * scale;
             let x = i * barWidth + barWidth / 2;
-            let y = canvas.height - barHeight;
+            let y = canvas.height - scaledPdf;
             if (i === 0) { ctx.moveTo(x, y); }
             else { ctx.lineTo(x, y); }
         }
         
         // 描画スタイル変更
-        ctx.strokeStyle = "#E15C50";
-        ctx.lineWidth = 4;
+        ctx.strokeStyle = "#ff0000"; // 赤
+        ctx.lineWidth = 5;           // 極太
         ctx.lineCap = "round";
         ctx.stroke();
     }
@@ -317,12 +308,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // --------------------------
     // 玉生成用関数
     // --------------------------
-    function updateBallCounter() {
-        document.getElementById("ballCounter").innerText = "生成した玉数 = " + ballCount + " / " + maxBallCount + " 個";
-    }
-
     function spawnBall() {
-        if (ballCount >= maxBallCount) {
+        if (ballCount >= 200) {
             stopBallGeneration();
             return;
         }
@@ -338,8 +325,8 @@ document.addEventListener("DOMContentLoaded", function() {
             friction: params.friction,
             frictionAir: params.frictionAir,
             render: { 
-                fillStyle: '#23BBD3',
-                strokeStyle: '#17324D',
+                fillStyle: '#00ffff',   // シアン
+                strokeStyle: '#000000', // 黒枠
                 lineWidth: 3 
             }
         });
@@ -348,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let randomVelocityX = enableRandomVelocity ? ((Math.random() * 2) - 1) : 0;
         Matter.Body.setVelocity(ball, { x: randomVelocityX, y: ball.velocity.y });
         ballCount++;
-        updateBallCounter();
+        document.getElementById("ballCounter").innerText = "生成した玉数 = " + ballCount + " 個";
     }
 
     // --------------------------
@@ -360,19 +347,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // 玉生成間隔を ballRate（秒あたり）から計算（ms単位）
         let interval = 1000 / params.ballRate;
         ballIntervalId = setInterval(spawnBall, interval);
-        const toggleButton = document.getElementById("toggleButton");
-        toggleButton.innerText = "停止";
-        toggleButton.classList.remove("button-start");
-        toggleButton.classList.add("button-stop");
+        document.getElementById("toggleButton").innerText = "Stop";
     }
     function stopBallGeneration() {
         if (!isGenerating) return;
         isGenerating = false;
         clearInterval(ballIntervalId);
-        const toggleButton = document.getElementById("toggleButton");
-        toggleButton.innerText = "開始";
-        toggleButton.classList.remove("button-stop");
-        toggleButton.classList.add("button-start");
+        document.getElementById("toggleButton").innerText = "Start";
     }
     document.getElementById("toggleButton").addEventListener("click", function () {
         if (isGenerating) { stopBallGeneration(); }
@@ -455,10 +436,10 @@ document.addEventListener("DOMContentLoaded", function() {
     function restartSimulation() {
         stopBallGeneration();
         ballCount = 0;
-        updateBallCounter();
+        document.getElementById("ballCounter").innerText = "生成した玉数 = 0 個";
         setupSimulation();
         updateBucketCounts(true);
-        // startBallGeneration() を削除：開始ボタンを押すまで玉生成は開始されない
+        // startBallGeneration() を削除：Startボタンを押すまで玉生成は開始されない
     }
 
     // パラメータ反映ボタン（ID: restartSimulationButton）のイベントリスナー
@@ -468,213 +449,50 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // --------------------------
-    // 分布比較用関数
+    // 乖離数値計算用関数
     // --------------------------
-    function getBinomialProbabilities(bucketCount) {
-        if (bucketCount <= 0) return [];
+    // 改修後の乖離（χ²）計算用関数
+    function calculateDeviation(counts) {
+    // counts: 各区間の実測値（玉数）の配列
+    // ここでは、理論的な期待値を正規分布に基づいて計算し、
+    // その期待値と実測値との差の乖離（χ²）を求めます。
 
-        const trials = bucketCount - 1;
-        const denominator = Math.pow(2, trials);
-        const probabilities = [];
-        let coefficient = 1;
-
-        for (let k = 0; k <= trials; k++) {
-            if (k > 0) {
-                coefficient = coefficient * (trials - k + 1) / k;
-            }
-            probabilities.push(coefficient / denominator);
-        }
-
-        return probabilities;
+    let n = counts.length;                      // 区間（列）の数（例：13）
+    let total = counts.reduce((sum, v) => sum + v, 0); // 総玉数（例：200個）
+    if (total === 0) return "--";
+    
+    // 理論的な正規分布を近似するためのパラメータ設定
+    // ここでは、区間番号を 0～(n-1) とし、平均値を (n-1)/2、標準偏差を n/4 とします。
+    let meanIndex = (n - 1) / 2;                 
+    let sigma = n / 4;
+    
+    // 各区間 i における正規分布の確率密度関数（PDF）の値を計算する
+    // PDF(i) = (1 / (sigma * √(2π))) * exp(-((i - meanIndex)² / (2σ²)))
+    let pdfValues = [];
+    for (let i = 0; i < n; i++) {
+        let pdf = 1 / (sigma * Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow(i - meanIndex, 2) / (2 * sigma * sigma));
+        pdfValues.push(pdf);
     }
-
-    function getTheoreticalCounts(counts) {
-        const total = counts.reduce((sum, v) => sum + v, 0);
-        const probabilities = getBinomialProbabilities(counts.length);
-        const scale = total > 0 ? total : 1;
-
-        return probabilities.map(probability => probability * scale);
-    }
-
-    function groupForChiSquare(counts, expected, minExpected) {
-        const groups = [];
-        let observedSum = 0;
-        let expectedSum = 0;
-
-        for (let i = 0; i < counts.length; i++) {
-            observedSum += counts[i];
-            expectedSum += expected[i];
-
-            if (expectedSum >= minExpected) {
-                groups.push({ observed: observedSum, expected: expectedSum });
-                observedSum = 0;
-                expectedSum = 0;
-            }
-        }
-
-        if (expectedSum > 0) {
-            if (groups.length > 0) {
-                const lastGroup = groups[groups.length - 1];
-                lastGroup.observed += observedSum;
-                lastGroup.expected += expectedSum;
-            } else {
-                groups.push({ observed: observedSum, expected: expectedSum });
-            }
-        }
-
-        return groups;
-    }
-
-    function calculateDistributionStats(counts) {
-        const total = counts.reduce((sum, v) => sum + v, 0);
-        const probabilities = getBinomialProbabilities(counts.length);
-        const expected = probabilities.map(probability => probability * total);
-
-        if (total === 0) {
-            return {
-                total,
-                probabilities,
-                expected,
-                distancePercent: null,
-                chiSquare: null,
-                degreesOfFreedom: null,
-                pValue: null
-            };
-        }
-
-        const distance = counts.reduce((sum, observed, i) => {
-            return sum + Math.abs((observed / total) - probabilities[i]);
-        }, 0) / 2;
-
-        const groups = groupForChiSquare(counts, expected, 5);
-        const degreesOfFreedom = groups.length - 1;
-        const chiSquare = groups.reduce((sum, group) => {
-            if (group.expected <= 0) return sum;
-            return sum + Math.pow(group.observed - group.expected, 2) / group.expected;
-        }, 0);
-
-        return {
-            total,
-            probabilities,
-            expected,
-            distancePercent: distance * 100,
-            chiSquare,
-            degreesOfFreedom,
-            pValue: degreesOfFreedom > 0 && total >= 30 ? chiSquarePValue(chiSquare, degreesOfFreedom) : null
-        };
-    }
-
-    function updateDistributionDisplay(counts) {
-        const stats = calculateDistributionStats(counts);
-        const display = document.getElementById("deviationDisplay");
-
-        if (stats.total === 0) {
-            display.innerHTML = '<span class="metric-main">分布のズレ: --</span><span class="metric-sub">χ²: -- / p値: --</span>';
-            return;
-        }
-
-        const detailText = stats.degreesOfFreedom > 0
-            ? 'χ²(' + stats.degreesOfFreedom + ')=' + stats.chiSquare.toFixed(2) + ' / p値(参考): ' + (stats.pValue === null ? "集計中" : formatPValue(stats.pValue))
-            : 'χ²: 集計中 / p値: 集計中';
-
-        display.innerHTML =
-            '<span class="metric-main">分布のズレ: ' + stats.distancePercent.toFixed(1) + '%</span>' +
-            '<span class="metric-sub">' + detailText + '</span>';
-    }
-
-    function formatPValue(value) {
-        if (value < 0.001) return "&lt;0.001";
-        return value.toFixed(3);
-    }
-
-    function chiSquarePValue(chiSquare, degreesOfFreedom) {
-        if (chiSquare < 0 || degreesOfFreedom <= 0) return null;
-        const pValue = regularizedGammaQ(degreesOfFreedom / 2, chiSquare / 2);
-        if (pValue === null) return null;
-        return Math.min(1, Math.max(0, pValue));
-    }
-
-    function logGamma(z) {
-        const coefficients = [
-            676.5203681218851,
-            -1259.1392167224028,
-            771.32342877765313,
-            -176.61502916214059,
-            12.507343278686905,
-            -0.13857109526572012,
-            9.9843695780195716e-6,
-            1.5056327351493116e-7
-        ];
-
-        if (z < 0.5) {
-            return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
-        }
-
-        z -= 1;
-        let x = 0.99999999999980993;
-        for (let i = 0; i < coefficients.length; i++) {
-            x += coefficients[i] / (z + i + 1);
-        }
-
-        const t = z + coefficients.length - 0.5;
-        return (0.5 * Math.log(2 * Math.PI)) + ((z + 0.5) * Math.log(t)) - t + Math.log(x);
-    }
-
-    function regularizedGammaQ(a, x) {
-        if (x < 0 || a <= 0) return null;
-        if (x === 0) return 1;
-
-        if (x < a + 1) {
-            return 1 - regularizedGammaPSeries(a, x);
-        }
-
-        return regularizedGammaQContinuedFraction(a, x);
-    }
-
-    function regularizedGammaPSeries(a, x) {
-        const maxIterations = 100;
-        const epsilon = 1e-12;
-        let sum = 1 / a;
-        let term = sum;
-
-        for (let n = 1; n <= maxIterations; n++) {
-            term *= x / (a + n);
-            sum += term;
-            if (Math.abs(term) < Math.abs(sum) * epsilon) break;
-        }
-
-        return sum * Math.exp(-x + (a * Math.log(x)) - logGamma(a));
-    }
-
-    function regularizedGammaQContinuedFraction(a, x) {
-        const maxIterations = 100;
-        const epsilon = 1e-12;
-        const tiny = 1e-30;
-        let b = x + 1 - a;
-        if (Math.abs(b) < tiny) b = tiny;
-        let c = 1 / tiny;
-        let d = 1 / b;
-        let h = d;
-
-        for (let i = 1; i <= maxIterations; i++) {
-            const an = -i * (i - a);
-            b += 2;
-            d = (an * d) + b;
-            if (Math.abs(d) < tiny) d = tiny;
-            c = b + (an / c);
-            if (Math.abs(c) < tiny) c = tiny;
-            d = 1 / d;
-            const delta = d * c;
-            h *= delta;
-            if (Math.abs(delta - 1) < epsilon) break;
-        }
-
-        return Math.exp(-x + (a * Math.log(x)) - logGamma(a)) * h;
-    }
+    
+    // PDF値の合計を求め、正規化のために使用
+    let sumPdf = pdfValues.reduce((sum, v) => sum + v, 0);
+    
+    // 各区間の期待値（理論値）を、総玉数に対するPDF値の比率から求める
+    // expected[i] = total * (pdfValues[i] / sumPdf)
+    let expected = pdfValues.map(v => total * v / sumPdf);
+    
+    // 各区間ごとに、乖離（χ²）の計算を行う
+    // (実測値 - 期待値)² / 期待値 を全区間で合計
+    let chiSquare = counts.reduce((sum, observed, i) => {
+        return sum + Math.pow(observed - expected[i], 2) / expected[i];
+    }, 0);
+    
+    // 計算結果を小数点以下2桁で返す
+    return chiSquare.toFixed(2);
+}
 
     // 初期化処理
     initializeParameters();
-    updateBallCounter();
     updateBucketCounts(true);
 
 });

@@ -1,132 +1,425 @@
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap');
+:root {
+    --bg: #EAF4FB;
+    --panel: #ffffff;
+    --panel-soft: #F7FBFE;
+    --ink: #17324D;
+    --muted: #5D7288;
+    --line: #B8D1E5;
+    --primary: #1976D2;
+    --primary-dark: #0F5EAD;
+    --start: #1B8A5A;
+    --start-dark: #116A43;
+    --stop: #C9433A;
+    --stop-dark: #A8322B;
+    --danger: #B94A48;
+    --shadow: 0 14px 34px rgba(31, 72, 112, 0.14);
+}
 
-/* 全体の基本設定 */
+* {
+    box-sizing: border-box;
+}
+
+html,
 body {
-    font-family: 'Comic Neue', 'Comic Sans MS', sans-serif;
-    font-size: 16px;
-    background-color: #fff;
-    /* コミック風ストライプ背景 */
-    background-image: repeating-linear-gradient(45deg, #eee 0px, #eee 20px, transparent 20px, transparent 40px);
-    margin: 20px;
-    padding: 0;
-    color: #000;
+    min-height: 100%;
 }
 
-h2, h3 {
-    font-family: 'Bangers', cursive, sans-serif;
-    letter-spacing: 1px;
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", "Yu Gothic UI", "Meiryo", sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+.app-shell {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 20px 18px;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    box-shadow: 8px 0 28px rgba(31, 72, 112, 0.08);
+}
+
+.sidebar-header {
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+    margin: 0 0 4px;
+    color: var(--primary-dark);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    margin-bottom: 10px;
 }
 
-h3 {
+h1,
+h2 {
+    margin: 0;
+    letter-spacing: 0;
+}
+
+h1 {
+    font-size: 21px;
+    line-height: 1.25;
+}
+
+.param-section {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.param-section h2 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--ink);
+    font-size: 15px;
+}
+
+.param-section h2 small {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.param-section label {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 86px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-weight: 650;
+}
+
+.param-section input[type="number"] {
+    width: 86px;
+    min-height: 34px;
+    padding: 6px 8px;
+    color: var(--ink);
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    text-align: right;
+}
+
+.param-section input[readonly] {
+    color: var(--muted);
+    background: #EDF4FA;
+}
+
+.check-row {
+    grid-template-columns: 20px minmax(0, 1fr) !important;
+    justify-content: start;
+}
+
+.check-row input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--primary);
+}
+
+.settings-actions {
+    display: grid;
+    gap: 10px;
+    padding-top: 16px;
+}
+
+.button {
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.button:active {
+    transform: translateY(0);
+}
+
+.button-primary {
+    color: #fff;
+    background: var(--primary);
+}
+
+.button-primary:hover {
+    background: var(--primary-dark);
+}
+
+.button-secondary {
+    color: var(--danger);
+    background: #fff;
+    border-color: #E2B9B8;
+}
+
+.button-secondary:hover {
+    background: #FFF5F5;
+    border-color: var(--danger);
+}
+
+.workspace {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 14px;
+    min-width: 0;
+    height: 100vh;
+    padding: 18px 22px 20px;
+    overflow: hidden;
+}
+
+.top-panel {
+    display: grid;
+    grid-template-columns: minmax(360px, 1fr) minmax(420px, 0.95fr);
+    gap: 14px;
+    align-items: stretch;
+}
+
+.run-card,
+.metrics,
+.bucket-panel,
+.simulation-panel {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.run-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 92px;
+    padding: 16px;
+}
+
+.button-start {
+    min-width: 156px;
+    min-height: 58px;
+    color: #fff;
+    background: var(--start);
     font-size: 24px;
 }
 
-/* パラメータ入力フォーム */
-#parameterPanel {
-    background-color: #fff;
-    border: 4px solid #000; /* 極太の黒枠 */
-    box-shadow: 8px 8px 0px #000; /* ハードな影 */
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 0;
+.button-start:hover {
+    background: var(--start-dark);
 }
 
-#parameterPanel label {
-    display: inline-block;
-    margin: 5px 10px 5px 0;
+.button-stop {
+    min-width: 156px;
+    min-height: 58px;
+    color: #fff;
+    background: var(--stop);
+    font-size: 24px;
+}
+
+.button-stop:hover {
+    background: var(--stop-dark);
+}
+
+.run-copy h2 {
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.run-copy p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: center;
+    min-height: 92px;
+    padding: 14px;
+}
+
+.stats-guide-link {
+    grid-column: 1 / -1;
+    justify-self: end;
+    color: var(--primary-dark);
+    font-size: 13px;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.stats-guide-link:hover {
+    text-decoration: underline;
+}
+
+.metric-card {
+    display: flex;
+    align-items: center;
+    min-height: 54px;
+    padding: 10px 12px;
+    background: var(--panel-soft);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    color: var(--ink);
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 750;
 }
 
-#parameterPanel input {
-    margin-left: 5px;
-    padding: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    border: 3px solid #000;
-    font-family: 'Comic Neue', sans-serif;
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
-    width: 60px;
+.metric-alert {
+    color: #A3312F;
 }
 
-/* ボタンのスタイル */
-button {
-    background-color: #ffcc00; /* ビビッドな黄色 */
-    border: 3px solid #000;
-    color: #000;
-    padding: 10px 20px;
-    margin: 10px;
-    border-radius: 0; /* 角丸なし */
-    box-shadow: 5px 5px 0px #000;
-    font-family: 'Comic Neue', sans-serif;
-    font-size: 20px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.1s;
+.distribution-card {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
 }
 
-button:hover {
-    background-color: #ffd633;
-    transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0px #000;
+.metric-main {
+    color: var(--ink);
 }
 
-button:active {
-    transform: translate(4px, 4px);
-    box-shadow: 1px 1px 0px #000;
+.metric-sub {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
 }
 
-button#resetParamsButton { background-color: #ff5555; color: #fff; }
-button#toggleButton { background-color: #55ff55; }
-
-/* 各セクションの区切り */
-.param-section {
-    border-bottom: 2px dashed #000;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-}
-.param-section:last-child {
-    border-bottom: none;
+.bucket-panel {
+    min-height: 86px;
+    max-height: 118px;
+    padding: 12px;
+    overflow: auto;
 }
 
-/* 各種表示テキスト */
-#ballCounter,
-#bucketCounts,
-#deviationDisplay {
-    font-size: 20px;
-    margin: 10px;
-    font-weight: bold;
-    background-color: #fff;
-    border: 2px solid #000;
-    display: inline-block;
-    padding: 5px 10px;
-    box-shadow: 3px 3px 0 #ccc;
-}
-#deviationDisplay {
-    color: #d00;
+.bucket-panel table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 13px;
 }
 
-/* シュミレーション描画エリア */
+.bucket-panel th,
+.bucket-panel td {
+    padding: 5px 7px;
+    border: 1px solid var(--line);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.bucket-panel th {
+    background: #DCEEFF;
+    color: var(--primary-dark);
+}
+
+.simulation-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 292px;
+    gap: 12px;
+    align-items: stretch;
+    min-height: 0;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.simulation-board {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
 #simulationContainer {
     position: relative;
-    width: 1600px;
-    height: 1600px;
-    border: 5px solid #000;
-    background-color: #fff;
-    margin: 20px 10px;
-    box-shadow: 10px 10px 0px #000;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    aspect-ratio: 1000 / 960;
+    min-height: 0;
+    overflow: hidden;
+    background: #FAFCFE;
+    border: 1px solid var(--line);
+    border-radius: 7px;
 }
 
-/* 棒グラフ用 Canvas */
+.chart-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 10px;
+    min-width: 0;
+    min-height: 0;
+    padding-left: 12px;
+    border-left: 1px solid var(--line);
+}
+
+.chart-panel h2 {
+    color: var(--primary-dark);
+    font-size: 15px;
+}
+
+#simulationContainer canvas.physics-canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 #barChart {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 4px solid #000;
-    box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
-    z-index: 2;
+    display: block;
+    width: 100%;
+    height: auto;
+    align-self: start;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    box-shadow: 0 10px 24px rgba(31, 72, 112, 0.16);
+}
+
+@media (max-width: 1200px) {
+    .app-shell {
+        grid-template-columns: 300px minmax(0, 1fr);
+    }
+
+    .top-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .simulation-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-panel {
+        padding-top: 12px;
+        padding-left: 0;
+        border-top: 1px solid var(--line);
+        border-left: 0;
+    }
+
+    .workspace {
+        overflow: auto;
+    }
 }
